@@ -211,6 +211,25 @@ bool loadFile(const string& filename, vector<Job>& jobs, int& n, int& m) {
     return true;
 }
 
+void generate70TestFiles() {
+    cout << "\nRozpoczynam masowe generowanie 70 plikow testowych..." << endl;
+
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dist_n(5, 20);
+    uniform_int_distribution<> dist_m(2, 20);
+
+    for (int i = 1; i <= 70; ++i) {
+        string filename = "test_gen_" + to_string(i) + ".txt";
+        int n = dist_n(gen);
+        int m = dist_m(gen);
+
+        generateRandomInstance(filename, n, m, 10, 100);
+    }
+
+    cout << "\nSUKCES! Wygenerowano wszystkie 70 plikow testowych." << endl;
+}
+
 int main() {
     int choice;
     string filename;
@@ -220,9 +239,10 @@ int main() {
     while (true) {
         cout << "\n--- MENU FLOW SHOP (HEURYSTYKA NEH) ---" << endl;
         cout << "1. Wczytaj pojedynczy plik" << endl;
-        cout << "2. Wygeneruj losowe dane" << endl;
+        cout << "2. Wygeneruj losowe dane (pojedynczy plik)" << endl;
         cout << "3. Uruchom testy wsadowe (Batch Run - zapis do CSV)" << endl;
-        cout << "4. Wyjscie" << endl;
+        cout << "4. Wygeneruj 70 plikow testowych (zalozenia z projektu)" << endl;
+        cout << "5. Wyjscie" << endl;
         cout << "Twoj wybor: ";
         cin >> choice;
 
@@ -248,13 +268,18 @@ int main() {
             generateRandomInstance(filename, gen_n, gen_m, min_t, max_t);
         }
         else if (choice == 3) {
-            // Lista plikow do przetworzenia w Batch Run
+            // Podstawowe pliki benchmarkowe
             vector<string> test_files = {
                 "dane.txt", "car1.txt", "car2.txt", "car3.txt", "car4.txt", "car5.txt",
                 "tai10x5.txt", "tai10x10.txt", "tai20x5.txt", "nowy.txt", "test_30_10.txt", "test_100_20.txt", "test_100_50.txt"
             };
 
-            cout << "\nRozpoczynam testy wsadowe..." << endl;
+            // Automatyczne dodanie 70 wygenerowanych plików do listy
+            for (int i = 1; i <= 70; ++i) {
+                test_files.push_back("test_gen_" + to_string(i) + ".txt");
+            }
+
+            cout << "\nRozpoczynam testy wsadowe (" << test_files.size() << " plikow)..." << endl;
             for (const string& file : test_files) {
                 if (loadFile(file, jobs, n, m)) {
                     cout << ">>> Przetwarzanie: " << file << " <<<" << endl;
@@ -266,6 +291,9 @@ int main() {
             cout << "\nTESTY ZAKONCZONE! Wyniki zapisano w pliku wyniki.csv" << endl;
         }
         else if (choice == 4) {
+            generate70TestFiles();
+        }
+        else if (choice == 5) {
             cout << "Wyjscie z programu..." << endl;
             break;
         }
